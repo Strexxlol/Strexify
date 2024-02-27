@@ -1,4 +1,4 @@
-# Main bot file.
+# 🤖 Main bot file.
 
 import discord
 from discord.ext import commands, tasks
