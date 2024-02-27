@@ -1475,4 +1475,4 @@ async def timestamp(ctx, yyyy: int, mm: int, dd: int, hh: int, min: int):
         await ctx.send(f"**Invalid date or time values.** {e}\nPlease use the following format: ```/timestamp YYYY MM DD HH MM```")
 
 
-client.run("MTE2ODUxMzUwMDkyMzA1NjE5OQ.GH97OY.FnqYEHbl2gQE6t_bo8ynhS4U8FAm4BS5vde6uo")
+client.run("TOKEN")
