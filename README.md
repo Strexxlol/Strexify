@@ -1,4 +1,16 @@
-# Strexify
-Strexify Discord bot - Your all-in-one solution.
+# 🤖 Strexify Discord bot - Your all-in-one solution.
 
-# "Strexify," a dynamic Discord bot powered by the discord.py library. Strexify enriches the Discord server experience with a diverse set of functionalities, encompassing entertaining features like a magic eight ball, rock-paper-scissors, and giveaways. Simultaneously, it facilitates effective server moderation through commands for message clearance, user banning, kicking, and the management of user warnings. The comprehensive feature set of Strexify aims to contribute to both the entertainment and administrative aspects of the Discord community, ensuring an engaging and well-moderated server environment.
+
+# 💻 Strexify is an all purpouse Discord bot with tons of features from moderation,
+# 💻 info-related, all the way to just fun games. It can even do maths, or have
+# 💻 a rock-paper-scissors game with you! Check it out with the links below!
+
+
+# 💖 The most polished Discord bot, made with love from Strexx:
+
+# ------------------------------------------------------
+# 🏅 Top.gg page: https://top.gg/bot/1168513500923056199
+# 🎮 Discord: https://discord.gg/ufcSBpdK
+# ------------------------------------------------------
+
+# 💖 Strexify - The ultimate solution.
