@@ -1,5 +1,6 @@
 # ✨ Welcome to Strexify - The Ultimate Solution!
 # 💎 This repository contains the source code for Strexify!
+# 🎭 Please do not use this code to copy, but instead learn!
 # 🎁 Make sure you have the latest version of Python installed!
 # 🎀 Join https://discord.gg/CvXyhbdmWv for any questions!
 
@@ -1478,5 +1479,8 @@ async def timestamp(ctx, yyyy: int, mm: int, dd: int, hh: int, min: int):
     except ValueError as e:
         await ctx.send(f"**Invalid date or time values.** {e}\nPlease use the following format: ```/timestamp YYYY MM DD HH MM```")
 
-
+# 🔮 Running the bot
+# 🎯 Replace 'BOTTOKEN' with your actual token.
 client.run("BOTTOKEN")
+
+# 🎉 And that is the end  of our code!
