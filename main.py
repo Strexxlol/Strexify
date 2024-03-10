@@ -1,5 +1,9 @@
-# 🤖 Main bot file.
+# ✨ Welcome to Strexify - The Ultimate Solution!
+# 💎 This repository contains the source code for Strexify!
+# 🎁 Make sure you have the latest version of Python installed!
+# 🎀 Join https://discord.gg/CvXyhbdmWv for any questions!
 
+# 🛒 Importing necessary packages and modules
 import discord
 from discord.ext import commands, tasks
 from itertools import cycle
@@ -19,30 +23,34 @@ import os
 import tracemalloc
 import sqlite3
 import time
-from googletrans import Translator
 import requests
+import time
 
 tracemalloc.start()
 
-
+# 📚 Setting up intents
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix=['='], intents=intents)
 client.remove_command('help')
 
-bot_status = cycle(["Your All-in-One solution 💖", "Strexifying {guild_count} servers 📢", "Get serious. Get Strexify ✨", "Power up with Strexify ⚡"])
+# 🔧 Setting up the bot's status
+bot_status = cycle([
+    "Your All-in-One solution 💖",
+    "Strexifying {guild_count} servers 📢",
+    "Get serious. Get Strexify ✨",
+    "Power up with Strexify ⚡",
+    "strexify.xyz 🔗"
+])
 
-try:
-    with open("warnings.json", "r") as f:
-        warnings = json.load(f)
-except FileNotFoundError:
-    warnings = {}
 
+# 🌐 Setting up the status cycle
 @tasks.loop(seconds=5)
 async def change_status():
     game_name = next(bot_status).format(guild_count=len(client.guilds))
     activity = discord.CustomActivity(name=game_name)
     await client.change_presence(activity=activity)
 
+# 🌐 What shall happen once the bot runs?
 @client.event
 async def on_ready():
     print("-----------------------------------------------")
@@ -54,7 +62,9 @@ async def on_ready():
     await daily_joke.start()
     await daily_quote.start()
 
-
+#   ---------------------
+# / 🏠 Server commands /
+# ---------------------
 @client.hybrid_command(name="ping", description="Check the bot's latency", aliases=["ms", "latency"])
 async def ping(ctx):
     try:
@@ -71,7 +81,7 @@ async def ping(ctx):
         embed.add_field(name="API Latency:", value=f"{round(ctx.bot.latency * 1000)}ms", inline=True)
         embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
 
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
     except Exception as e:
         await ctx.send(f"An error occurred: {e}")
 
@@ -105,11 +115,14 @@ async def magic_eightball(ctx, *, question):
 
 
 
-
-@client.hybrid_command(name="clear", description="Clear a certain ammount of messages", aliases=["purge", "delete"])
+@client.hybrid_command(name="clear", description="Clear a certain amount of messages", aliases=["purge", "delete"])
 @commands.has_permissions(manage_messages=True)
-async def clear(ctx, count: int):
-    await ctx.channel.purge(limit=count + 1)
+async def clear(ctx, count: int, user: commands.MemberConverter = None):
+    def check(message):
+        return user is None or message.author == user
+    
+    await ctx.channel.purge(limit=count + 1, check=check)
+
 
 @client.hybrid_command(name="sync", description="Sync the bot's slash commands")
 async def sync(ctx):
@@ -670,7 +683,7 @@ async def invite(ctx):
         description="Click the link below to add Strexify to your server.",
         color=0xB19D30
     )
-    embed.add_field(name="Invite Link", value="[**Invite me now!**](https://discord.com/oauth2/authorize?client_id=1168513500923056199&permissions=8&scope=bot)")
+    embed.add_field(name="Invite Link", value="[**Invite me now!**](https://discord.com/oauth2/authorize?client_id=1168513500923056199&permissions=10741122166006&scope=bot+applications.commands)")
 
     embed.set_thumbnail(url="https://simtric.net/soft/Links/icon.png")
 
@@ -727,14 +740,15 @@ async def botinfo(ctx):
     total_users = sum(guild.member_count for guild in client.guilds)
 
     embed = discord.Embed(
-        title="⚡ Get serious. Get Strexify.",
+        title="⚡ About Strexify",
         color=0xB19D30
     )
     
     embed.add_field(name="\u2001", value="\u2001", inline=False)
 
     embed.add_field(name=":alarm_clock: Bot Created", value=f"• {created_at}", inline=False)
-    embed.add_field(name=":computer: Host", value="• [**Nexcord**](https://my.nexcord.com/home)", inline=False)
+    embed.add_field(name=":link: Website", value=f"• [**strexify.xyz**](https://strexify.xyz)", inline=False)
+    embed.add_field(name=":computer: Host", value="• [**Cybrancee**](https://cybrancee.com)", inline=False)
     embed.add_field(name=":bar_chart: Working for", value=f"• **{server_count} servers**\n• **{total_users} users**", inline=False)
     embed.add_field(name=":newspaper: Developer", value="• [**Strexx**](https://discordapp.com/users/602092087957127179)", inline=False)
 
@@ -746,9 +760,16 @@ async def botinfo(ctx):
 
     embed.add_field(
         name=":people_hugging: With the Help of",
-        value="• [**Kiki124**](https://discordapp.com/users/1105414178937774150)\n• [**Franki1902**](https://discordapp.com/users/833752068300210236)\n• [**LS_Wartaal**](https://discordapp.com/users/817767356973580298)",
+        value=(
+            "• [**Kiki124**](https://discordapp.com/users/1105414178937774150)\n"
+            "• [**Franki1902**](https://discordapp.com/users/833752068300210236)\n"
+            "• [**LS_Wartaal**](https://discordapp.com/users/817767356973580298)\n"
+            "• [**XTHESilent**](https://discordapp.com/users/1178657876823265320)\n"
+            "• [**Phantom.py**](https://discordapp.com/users/1178278763180609587)"
+        ),
         inline=False
-    )
+)
+
 
     embed.set_thumbnail(url=client.user.avatar.url)
 
@@ -872,22 +893,26 @@ jokes = [
 @tasks.loop(hours=24)
 async def daily_joke():
     Channel = client.get_channel(1203368779673903235)
+
+    today = datetime.datetime.utcnow().date()
+    async for message in Channel.history(limit=1):
+        if message.created_at.date() == today:
+            return
+
     random_joke = random.choice(jokes)
-    
+
     embed = discord.Embed(
-            title="Joke Time! 🤣",
-            description=random_joke,
-            color=0xB19D30
-            )
+        title="Joke Time! 🤣",
+        description=random_joke,
+        color=0xB19D30
+    )
 
     embed.set_thumbnail(url="https://images.emojiterra.com/twitter/v13.1/512px/1f923.png")
 
-    embed.set_footer(text=f"Did you know that new joke is sent here everyday! (Or when the bot restarts)")
+    embed.set_footer(text="Did you know that a new joke is sent here every day! (Or when the bot restarts)")
 
     try:
         await Channel.send(embed=embed)
-        
-
     except Exception as e:
         await Channel.send(f"An error occurred: {e}")
 
@@ -1105,7 +1130,7 @@ async def servercount(ctx):
 
     embed = discord.Embed(
         title=":rotating_light: Server Count",
-        description=f"The bot is currently in **{server_count} servers!**\n• [**Invite me to your server! :link:**](https://discord.com/oauth2/authorize?client_id=1168513500923056199&permissions=8&scope=bot)",
+        description=f"The bot is currently in **{server_count} servers!**\n• [**Invite me to your server! :link:**](https://discord.com/oauth2/authorize?client_id=1168513500923056199&permissions=10741122166006&scope=bot+applications.commands)",
         color=0xB19D30
     )
     embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/541/541555.png")
@@ -1213,7 +1238,7 @@ async def replacerole(ctx, member: discord.Member, old_role: discord.Role, new_r
             await ctx.send("You or the bot don't have permission to manage roles.")
     except discord.Forbidden:
         await ctx.send("I don't have permission to manage roles.")
-
+        
 @client.hybrid_command(name="nick", description="Change the nickname of any user")
 async def change_nickname(ctx, member: discord.Member, *, nickname: str):
     try:
@@ -1242,7 +1267,7 @@ async def usercount(ctx):
 
         embed = discord.Embed(
             title=":busts_in_silhouette: User Count",
-            description=f"The bot can see a total of **{total_users} users!**\n• [**Invite me to your server! :link:**](https://discord.com/oauth2/authorize?client_id=1168513500923056199&permissions=8&scope=bot)",
+            description=f"The bot can see a total of **{total_users} users!**\n• [**Invite me to your server! :link:**](https://discord.com/oauth2/authorize?client_id=1168513500923056199&permissions=10741122166006&scope=bot+applications.commands)",
             color=0xB19D30
         )
         embed.set_thumbnail(url="https://creazilla-store.fra1.digitaloceanspaces.com/emojis/56880/busts-in-silhouette-emoji-clipart-xl.png")
@@ -1294,27 +1319,6 @@ async def reset_nick(ctx, member: discord.Member):
     else:
         await ctx.send("You don't have the necessary permissions to use this command.")
 
-translator = Translator()
-
-@client.hybrid_command(name="translate", description="Translate a message to the specified language")
-async def translate(ctx, language: str, *, message: str):
-    try:
-        capitalized_language = language.capitalize()
-
-        translation = translator.translate(message, dest=language)
-        translated_message = translation.text
-
-        embed = discord.Embed(
-            title="🌍 Translation",
-            description=f"**• Original:** {message}\n**• {capitalized_language}:** {translated_message}",
-            color=0xB19D30
-        )
-
-        embed.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/3898/3898082.png")
-
-        await ctx.send(embed=embed)
-    except Exception as e:
-        await ctx.send(f"**❌ An error occurred: {e}**\n\nPlease use the following format: ```/translate [language] [message]```")
 
 @client.hybrid_command(name="team", description="Display a list of the bot's team")
 async def team(ctx):
@@ -1322,9 +1326,8 @@ async def team(ctx):
         guild_id = 1185320952448430180
         guild = client.get_guild(guild_id)
 
-        role_ids = [1185330777311948840, 1205258456484020234, 1185331791301705758, 
-                    1185331921547432076, 1201981013144916088, 1185332186774245456, 
-                    1201980813345038438, 1185332267606888569]
+        role_ids = [1185330777311948840, 1215632577709473822, 
+                    1185562878137348106]
 
         team_members = [member for member in guild.members if any(role.id in role_ids for role in member.roles)]
 
@@ -1388,11 +1391,11 @@ async def developer(ctx):
 
 @client.hybrid_command(name="host", description="Get the bot's hosting website")
 async def host(ctx):
-    image_url = "https://my.nexcord.com/storage/logo.png"
+    image_url = "https://images.g2crowd.com/uploads/product/image/social_landscape/social_landscape_87ceb358523ce762ba40369c18687800/cybrancee.png"
 
     embed = discord.Embed(
         title="Hosting Website",
-        description="I am currently being hosted in [**Nexcord!**](https://my.nexcord.com/home)\nJoin their [**Discord Server!**](https://discord.gg/nexcord-com-1068229111924936854)",
+        description="I am currently being hosted in [**Cybrancee!**](https://cybrancee.com)",
         color=0xB19D30
     )
 
