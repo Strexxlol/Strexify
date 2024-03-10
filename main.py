@@ -740,7 +740,7 @@ async def botinfo(ctx):
     total_users = sum(guild.member_count for guild in client.guilds)
 
     embed = discord.Embed(
-        title="⚡ About Strexify",
+        title="✨ About Strexify",
         color=0xB19D30
     )
     
@@ -750,13 +750,14 @@ async def botinfo(ctx):
     embed.add_field(name=":link: Website", value=f"• [**strexify.xyz**](https://strexify.xyz)", inline=False)
     embed.add_field(name=":computer: Host", value="• [**Cybrancee**](https://cybrancee.com)", inline=False)
     embed.add_field(name=":bar_chart: Working for", value=f"• **{server_count} servers**\n• **{total_users} users**", inline=False)
-    embed.add_field(name=":newspaper: Developer", value="• [**Strexx**](https://discordapp.com/users/602092087957127179)", inline=False)
 
     embed.add_field(
         name=":symbols: Prefixes",
         value="`=` or `/`",
         inline=False
     )
+
+    embed.add_field(name=":newspaper: Developer", value="• [**Strexx**](https://discordapp.com/users/602092087957127179)", inline=False)
 
     embed.add_field(
         name=":people_hugging: With the Help of",
@@ -1478,4 +1479,4 @@ async def timestamp(ctx, yyyy: int, mm: int, dd: int, hh: int, min: int):
         await ctx.send(f"**Invalid date or time values.** {e}\nPlease use the following format: ```/timestamp YYYY MM DD HH MM```")
 
 
-client.run("TOKEN")
+client.run("BOTTOKEN")
