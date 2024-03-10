@@ -63,6 +63,13 @@ async def on_ready():
     await daily_joke.start()
     await daily_quote.start()
 
+# 🔨 Saving user-warning details
+try:
+    with open("warnings.json", "r") as f:
+        warnings = json.load(f)
+except FileNotFoundError:
+    warnings = {}
+
 #   ---------------------
 # / 🏠 Server commands /
 # ---------------------
