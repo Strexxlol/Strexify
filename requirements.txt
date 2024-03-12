@@ -1,0 +1,6 @@
+emoji==2.10.0
+httpx==0.13.3
+humanize==4.9.0
+idna==2.10
+multidict==6.0.4
+requests==2.31.0
