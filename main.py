@@ -26,7 +26,10 @@ import time
 import requests
 import time
 import urllib
+import colorama
+from colorama import Fore, Style
 
+colorama.init(autoreset=True)
 tracemalloc.start()
 
 # 📚 Setting up intents
@@ -56,9 +59,9 @@ async def change_status():
 # 🌐 What shall happen once the bot runs?
 @client.event
 async def on_ready():
-    print("-----------------------------------------------")
-    print("Strexify has successfully connected to Discord!")
-    print("-----------------------------------------------")
+    print(Fore.CYAN + "---------------------------------------------")
+    print(Fore.MAGENTA + Style.BRIGHT + "Bot is now online! Thanks for using Strexify!")
+    print(Fore.CYAN + "---------------------------------------------")
     client.startTime = datetime.datetime.utcnow()
     change_status.start()
     await client.tree.sync()
@@ -71,8 +74,6 @@ async def setup_hook():
         if filename.endswith('.py'):
             await client.load_extension(f'Cogs.{filename[:-3]}')
             print(f"Loaded Cog: {filename[:-3]}")
-        else:
-            print(f"Skipped loading Cog. ({filename[:-3]})")
 
 #   ---------------------
 # / 🏠 Server commands /
@@ -216,24 +217,6 @@ async def roles(ctx, member: discord.Member = None):
 
     await ctx.reply(embed=embed, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
-@client.hybrid_command(name="serverinfo", description="Get info about the server")
-async def serverinfo(ctx):
-    server = ctx.guild
-    embed = discord.Embed(title=f"{server.name}", color=0xB19D30)
-
-    if server.icon:
-        embed.set_thumbnail(url=str(server.icon.url))
-    
-    embed.add_field(name="Members :man:", value=server.member_count, inline=False)
-    created_at_timestamp = f"<t:{int(server.created_at.timestamp())}:F>"
-    embed.add_field(name="Server Created :alarm_clock:", value=created_at_timestamp, inline=False)
-    embed.add_field(name="Roles :judge:", value=len(server.roles), inline=False)
-
-    total_boosts = server.premium_subscription_count
-    embed.add_field(name="Server Boosts :gem:", value=total_boosts, inline=False)
-
-    await ctx.reply(embed=embed, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
-
 @client.hybrid_command(name="giveaway", description="Start a first-to-react giveaway")
 async def reactiongiveaway(ctx, *, prize: str):
     embed = discord.Embed(
@@ -274,25 +257,27 @@ async def userinfo(ctx, user_info: discord.Member = None):
     if not user_info:
         user_info = ctx.author
 
+    nickname = user_info.nick if user_info.nick else "None"
+    is_bot = "True" if user_info.bot else "False"
+    created_at_timestamp = f"<t:{int(user_info.created_at.timestamp())}:F>"
+    join_date_timestamp = f"<t:{int(user_info.joined_at.timestamp())}:F>"
+    highest_role = user_info.top_role.mention if user_info.top_role.name != "@everyone" else "No roles"
+        
     embed = discord.Embed(
         title=f"{user_info.display_name}'s User Information",
+        description=(
+            f"- :bust_in_silhouette: User: {user_info.mention}\n"
+            f"- :identification_card: Username: {user_info.name}\n"
+            f"- :identification_card: User ID: `{user_info.id}`\n"
+            f"- :name_badge: Nickname: {nickname}\n"
+            f"- :robot: Bot: {is_bot}\n"
+            f"- :calendar: Created at: {created_at_timestamp}\n"
+            f"- :calendar: Joined at: {join_date_timestamp}\n"
+            f"- :medal: Highest Role: {highest_role}"
+        ),
         color=0xB19D30,
     )
 
-    embed.add_field(name="User :man:", value=user_info.mention, inline=False)
-
-    created_at_timestamp = f"<t:{int(user_info.created_at.timestamp())}:F>"
-    embed.add_field(name="Account Created :alarm_clock:", value=created_at_timestamp, inline=False)
-
-    join_date_timestamp = f"<t:{int(user_info.joined_at.timestamp())}:F>"
-    embed.add_field(name="Joined Server :alarm_clock:", value=join_date_timestamp, inline=False)
-
-    embed.add_field(name="User ID :identification_card:", value=user_info.id, inline=False)
-
-    embed.add_field(name="Bot :robot:", value="Yes, this user is a bot." if user_info.bot else "No, this user is not a bot.", inline=False)
-
-    highest_role = user_info.top_role.mention if user_info.top_role.name != "@everyone" else "No roles"
-    embed.add_field(name="Highest Role :judge:", value=highest_role, inline=False)
 
     embed.set_thumbnail(url=user_info.avatar.url)
 
@@ -300,6 +285,33 @@ async def userinfo(ctx, user_info: discord.Member = None):
     view = discord.ui.View()
     view.add_item(button)
     await ctx.reply(embed=embed, view=view, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
+@client.hybrid_command(name="serverinfo", description="Get info about the server")
+async def serverinfo(ctx):
+    server = ctx.guild
+    embed = discord.Embed(title=f"{server.name}", color=0xB19D30)
+
+    if server.icon:
+        embed.set_thumbnail(url=str(server.icon.url))
+    
+    operators = sum(1 for member in server.members if member.guild_permissions.administrator and not member.bot)
+    newest_member = max(server.members, key=lambda m: m.joined_at)
+
+    description = (
+        f"- :crown: Server Owner: {server.owner.mention}\n"
+        f"- :busts_in_silhouette: Members: {server.member_count}\n"
+        f"- :gem: Boosts: {server.premium_subscription_count}\n"
+        f"- :medal: Roles: {len(server.roles)}\n"
+        f"- :calendar: Server Created: <t:{int(server.created_at.timestamp())}:F>\n"
+        f"- :crown: Operators: {operators}\n"
+        f"- :wave: Newest Member: {newest_member.mention if not newest_member.bot else 'Not available'}"
+    )
+
+
+    embed.description = description
+
+    await ctx.reply(embed=embed, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+
     
 @client.hybrid_command(name="help", description="Get a list of the bot's commands")
 async def help(ctx, *, command_name: str = None):
@@ -1026,16 +1038,6 @@ async def coinflip(ctx):
         except TimeoutError:
             break
 
-@client.hybrid_command(name="rename", description="Rename any channel or category")
-async def rename(ctx, target: discord.abc.GuildChannel, new_name: str):
-    try:
-        await target.edit(name=new_name)
-        await ctx.send(f"Successfully renamed {target.mention} to it's new name!")
-    except discord.Forbidden:
-        await ctx.send("I don't have the necessary permissions to rename channels.")
-    except discord.HTTPException as e:
-        await ctx.send(f"An error occurred: {e}")
-
 @client.hybrid_command(name="usercount", description="Shows the total number of users the bot can see")
 async def usercount(ctx):
     try:
@@ -1172,9 +1174,12 @@ async def weather(ctx, city):
         await ctx.send(f"Error fetching weather data: {e}")
 
 @client.hybrid_command(name="timestamp", description="Get a timestamp for any specific date")
-async def timestamp(ctx, yyyy: int, mm: int, dd: int, hh: int, min: int):
+async def timestamp(ctx, yyyy: int = None, mm: int = None, dd: int = None, hh: int = None, min: int = None):
     try:
-        specified_datetime = datetime.datetime(yyyy, mm, dd, hh, min)
+        if yyyy is None or mm is None or dd is None or hh is None or min is None:
+            specified_datetime = datetime.datetime.now()
+        else:
+            specified_datetime = datetime.datetime(yyyy, mm, dd, hh, min)
 
         formatted_timestamps = [
             f"<t:{int(specified_datetime.timestamp())}:f> **//** `<t:{int(specified_datetime.timestamp())}:f>`",
@@ -1209,4 +1214,4 @@ async def timestamp(ctx, yyyy: int, mm: int, dd: int, hh: int, min: int):
     except ValueError as e:
         await ctx.send(f"**Invalid date or time values.** {e}\nPlease use the following format: ```/timestamp YYYY MM DD HH MM```")
 
-client.run("BOTTOKEN")
+client.run("TOKEN")
