@@ -1,7 +1,24 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
+from itertools import cycle
+from discord import TextChannel
+import humanize
+from datetime import datetime as dt, timedelta
+import asyncio
+import random
 from discord import ui, app_commands
 import json
+import datetime
+from typing import Dict
+from discord import ui
+from typing import Union
+import datetime as dt
+import os
+import tracemalloc
+import sqlite3
+import time
+import time
+import urllib
 
 class Moderation(commands.Cog):
     def __init__(self, client):
@@ -85,7 +102,7 @@ class Moderation(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
-    @commands.hybrid_command(name="clear", description="Clear a certain amount of messages", aliases=["purge", "delete"])
+    @commands.hybrid_command(name="purge", description="Delete a certain amount of messages", aliases=["clear", "delete"])
     @commands.has_permissions(manage_messages=True)
     async def clear(self, ctx, count: int, user: commands.MemberConverter = None):
         def check(message):
@@ -182,6 +199,16 @@ class Moderation(commands.Cog):
         except discord.Forbidden:
             await ctx.send("I don't have permission to change nicknames.")
 
+    @commands.hybrid_command(name="rename", description="Rename any channel or category")
+    async def rename(self, ctx, target: discord.abc.GuildChannel, new_name: str):
+        try:
+            await target.edit(name=new_name)
+            await ctx.send(f"Successfully renamed {target.mention} to it's new name!")
+        except discord.Forbidden:
+            await ctx.send("I don't have the necessary permissions to rename channels.")
+        except discord.HTTPException as e:
+            await ctx.send(f"An error occurred: {e}")            
+            
     @commands.hybrid_command(name="resetnick", description="Reset anyone's server nickname")
     async def reset_nick(self,ctx, member: discord.Member):
         if ctx.author.guild_permissions.manage_nicknames:
@@ -216,7 +243,62 @@ class Moderation(commands.Cog):
                 await ctx.reply(f":mute: I cannot unmute {member.mention} as he has not been muted.", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
 
         else:
-            await ctx.reply("Sorry! You do not have the required permissions to use this command.", mention_author=False, allowed_mentions=discord.AllowedMentions.none())
+            await ctx.reply("Sorry! You do not have the required permissions to use this command.", mention_author=False, allowed_mentions=discord.AllowedMentions.none())            
+
+    @commands.hybrid_command(name="lock", description="Prevent members from speaking in a channel")
+    @commands.has_permissions(manage_channels=True)
+    async def lock(self, ctx, duration: str = None, channel: discord.TextChannel = None):
+        if not channel:
+            channel = ctx.channel
+
+        if channel.overwrites_for(ctx.guild.default_role).send_messages is False:
+            await ctx.send(f"{channel.mention} is already locked.")
+            return
+
+        await channel.set_permissions(ctx.guild.default_role, send_messages=False)
+        await ctx.send(f"{channel.mention} has been locked. Members cannot speak there.")
+
+        if duration:
+            duration = duration.lower()
+            time_units = {"m": 60, "h": 3600, "d": 86400, "s": 1}
+            unit = duration[-1]
+            if unit in time_units:
+                try:
+                    time = int(duration[:-1]) * time_units[unit]
+                    await asyncio.sleep(time)
+                    await channel.set_permissions(ctx.guild.default_role, send_messages=True)
+                    await ctx.send(f"{channel.mention} has been unlocked. Members can speak there again.")
+                except ValueError:
+                    await ctx.send("Invalid duration format.")
+            else:
+                await ctx.send("Invalid duration unit. Use 'm' for minutes, 'h' for hours, 'd' for days, or 's' for seconds.")
+
+    @lock.error
+    async def lock_error(ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("You don't have permission to lock channels.")
+        else:
+            await ctx.send("An error occurred while trying to lock the channel.")
+
+    @commands.hybrid_command(name="unlock", description="Unlocks the specified channel or the current locked channel, allowing members to speak again")
+    @commands.has_permissions(manage_channels=True)
+    async def unlock(self, ctx, channel: discord.TextChannel = None):
+        if not channel:
+            channel = ctx.channel
+
+        if channel.overwrites_for(ctx.guild.default_role).send_messages is True:
+            await ctx.send(f"{channel.mention} is already unlocked.")
+            return
+
+        await channel.set_permissions(ctx.guild.default_role, send_messages=True)
+        await ctx.send(f"{channel.mention} has been unlocked. Members can speak there again.")
+
+    @unlock.error
+    async def unlock_error(ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("You don't have permission to unlock channels.")
+        else:
+            await ctx.send("An error occurred while trying to unlock the channel.")       
 
 async def setup(client):
   await client.add_cog(Moderation(client))
