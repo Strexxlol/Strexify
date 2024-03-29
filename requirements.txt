@@ -5,3 +5,5 @@ idna==2.10
 multidict==6.0.4
 requests==2.31.0
 colorama==0.4.4
+aiohttp=3.9.3
+json
